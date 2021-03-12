@@ -1,6 +1,17 @@
 import joplin from 'api';
 import { ContentScriptType } from 'api/types';
 
+/**
+ * return `//` prefix
+ * @param path
+ * @returns
+ */
+function removePathPrefix(path: string) {
+	if (path.startsWith('/')) path = path.substr(1);
+	if (path.startsWith('/')) path = path.substr(1);
+	return path;
+}
+
 async function jump(url: URL) {
 	/**
 	 * examples:
@@ -23,8 +34,11 @@ async function jump(url: URL) {
 		if (r.items.length > 0) {
 			joplin.commands.execute('openNote', r.items[0].id, hash);
 		}
-	} else if (hash) {
-		joplin.commands.execute('scrollToHash', hash);
+	}
+
+	else if (hash) {
+		// do I need this? I already had outline.
+		// joplin.commands.execute('scrollToHash', hash);
 	}
 }
 
@@ -34,11 +48,7 @@ async function exec(url: URL) {
 	 *   - exec://{command}?0=a&1=ds
 	 */
 
-	let command = url.pathname;
-
-	// remove `//` prefix:
-	if (command.startsWith('/')) command = command.substr(1);
-	if (command.startsWith('/')) command = command.substr(1);
+	let command = removePathPrefix(url.pathname);
 
 	const args = [];
 	for (let i = 0; i < 20; i++) {
