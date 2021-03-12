@@ -44,7 +44,11 @@ async function exec(url: URL) {
 	for (let i = 0; i < 20; i++) {
 		const is = i.toString();
 		if (url.searchParams.has(is)) {
-			args.push(url.searchParams.get(is));
+			let val = url.searchParams.get(is);
+			try {
+				val = JSON.parse(val);
+			} catch {}
+			args.push(val);
 		} else {
 			break;
 		}
