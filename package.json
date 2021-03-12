@@ -1,6 +1,11 @@
 {
-  "name": "joplin-plugin-joplin-user-link-plugin",
+  "name": "joplin-plugin-user-link",
   "version": "1.0.0",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/Cologler/userlink-joplin"
+  },
+  "homepage": "https://github.com/Cologler",
   "scripts": {
     "dist": "webpack --joplin-plugin-config buildMain && webpack --joplin-plugin-config buildExtraScripts && webpack --joplin-plugin-config createArchive",
     "prepare": "pnpm run dist",
