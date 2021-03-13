@@ -6,6 +6,15 @@ A Joplin plugin for custom links.
 
 **Ensure your URL is encoded!**
 
+### Jump via query
+
+``` markdown
+[???](jump://?query=blabla)
+[???](jump://?query=title:blabla) # search by title
+```
+
+For more query syntax, see [here](https://joplinapp.org/#searching).
+
 ### exec any command
 
 ``` markdown
@@ -18,15 +27,6 @@ A Joplin plugin for custom links.
 - Arguments will parse as json if possible, or use raw string;
 
 Find more commands [here](https://joplinapp.org/api/references/plugin_api/classes/joplincommands.html).
-
-### Jump via query
-
-``` markdown
-[???](jump://?query=blabla)
-[???](jump://?query=title:blabla) # search by title
-```
-
-For more query syntax, see [here](https://joplinapp.org/#searching). 
 
 ## Build
 
