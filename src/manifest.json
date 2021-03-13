@@ -2,11 +2,11 @@
 	"manifest_version": 1,
 	"id": "b53da1f6-868c-468d-b60c-2897a27166ac",
 	"app_min_version": "1.7",
-	"version": "1.0.0",
+	"version": "1.0.1",
 	"name": "Joplin User Link Plugin",
-	"description": "",
+	"description": "A Joplin plugin for custom links, like `jump://?query=blabla`.",
 	"author": "Cologler",
-	"homepage_url": "Homepage URL",
-	"repository_url": "Repository URL",
-	"keywords": []
+	"homepage_url": "https://github.com/Cologler/userlink-joplin",
+	"repository_url": "https://github.com/Cologler/userlink-joplin",
+	"keywords": ["link"]
 }
