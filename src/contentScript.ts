@@ -14,7 +14,7 @@ export default function(context: ContentScriptContext) {
 
                 const href = token.attrGet('href');
                 if (href) {
-                    if (/^(?:jump|exec):/i.test(href)) {
+                    if (/^(?:jumpq?|exec):/i.test(href)) {
                         const data = btoa(href);
                         const action = `
                             event.stopPropagation();

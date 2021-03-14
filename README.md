@@ -6,17 +6,27 @@ A Joplin plugin for custom links.
 
 **Ensure your URL is encoded!**
 
-### Jump via query
+### Jump to anything
 
 ``` markdown
+use resource id:
+
 [???](jump://notes/{noteId})            # jump to note by id
 [???](jump://notebooks/{notebookId})    # jump to notebook by id
 [???](jump://tags/{tagId})              # jump to tag by id
 
-[???](jump://?query=blabla)             # jump to note via search
-[???](jump://notes/?query=blabla)       # jump to note via search (also)
-[???](jump://notebooks/?query=blabla)   # jump to notebook via search
-[???](jump://tags/?query=blabla)        # jump to tag via search
+use query params:
+
+[???](jump://?query={query})            # jump to note via search
+[???](jump://notes/?query={query})      # jump to note via search (also)
+[???](jump://notebooks/?query={query})  # jump to notebook via search
+[???](jump://tags/?query={query})       # jump to tag via search
+
+or use `jumpq://`:
+
+[???](jumpq://notes/{query})            # jump to note via search
+[???](jumpq://notebooks/{query})        # jump to notebook via search
+[???](jumpq://tags/{query})             # jump to tag via search
 ```
 
 For more query syntax, see [here](https://joplinapp.org/#searching).

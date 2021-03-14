@@ -18,7 +18,7 @@ function removePathPrefix(path: string, count: number = 2) {
     return path;
 }
 
-async function jump(url: URL) {
+async function jump(url: URL, pathAsQuery: boolean) {
     /**
      * examples:
      *   - jump://?query={query}#{hash}
@@ -47,43 +47,48 @@ async function jump(url: URL) {
 
     let type: 'folder' | 'tag' | 'note';
     let jumper: (id: string) => Promise<any>;
-    let objId: string = '';
+    let remainingPath: string = '';
 
     const lowerPath = path.toLowerCase();
     if (lowerPath === 'notebooks' || lowerPath.startsWith('notebooks/')) {
         type = 'folder';
         jumper = jumpNoteBook;
-        objId = removePathPrefix(path.substr(9), 1);
+        remainingPath = removePathPrefix(path.substr(9), 1);
     }
     else if (lowerPath === 'tags' || lowerPath.startsWith('tags/')) {
         type = 'tag';
         jumper = jumpTag;
-        objId = removePathPrefix(path.substr(4), 1);
+        remainingPath = removePathPrefix(path.substr(4), 1);
     }
-    else if (lowerPath === 'notes' || lowerPath.startsWith('notes/') || !lowerPath) {
+    else if (lowerPath === 'notes' || lowerPath.startsWith('notes/')) {
         type = 'note';
         jumper = jumpNote;
-        if (lowerPath) {
-            objId = removePathPrefix(path.substr(5), 1);
-        }
-    } else {
+        remainingPath = removePathPrefix(path.substr(5), 1);
+    }
+    else if (!lowerPath) {
+        type = 'note';
+        jumper = jumpNote;
+    }
+    else {
         console.debug(`ignore unknown path: ${path}`);
         return; // ignored
     }
     console.debug(`link type: ${type}`);
 
     let r;
-    if (objId) {
-        console.debug(`find by id: ${objId}`);
+    if (remainingPath && !pathAsQuery) {
+        console.debug(`find by id: ${remainingPath}`);
         try {
-            r = await joplin.data.get([type + 's', objId]);
+            r = await joplin.data.get([type + 's', remainingPath]);
         } catch (error) {
             // not found
             return;
         }
     }
     else {
-        const query = url.searchParams.get('query');
+        const query = pathAsQuery
+            ? remainingPath
+            : url.searchParams.get('query');
         if (!query) {
             return;
         }
@@ -141,7 +146,11 @@ joplin.plugins.register({
             const url = new URL(href);
             switch (url.protocol.toLowerCase()) {
                 case 'jump:':
-                    jump(url);
+                    jump(url, false);
+                    break;
+
+                case 'jumpq:':
+                    jump(url, true);
                     break;
 
                 case 'exec:':
