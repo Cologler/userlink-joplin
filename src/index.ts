@@ -2,13 +2,19 @@ import joplin from 'api';
 import { ContentScriptType } from 'api/types';
 
 /**
- * return `//` prefix
+ * return `/` prefix
  * @param path
  * @returns
  */
-function removePathPrefix(path: string) {
-    if (path.startsWith('/')) path = path.substr(1);
-    if (path.startsWith('/')) path = path.substr(1);
+function removePathPrefix(path: string, count: number = 2) {
+    while (--count >= 0) {
+        if (path.startsWith('/')) {
+            path = path.substr(1);
+        } else {
+            break;
+        }
+    }
+
     return path;
 }
 
@@ -20,31 +26,79 @@ async function jump(url: URL) {
      *   - jump://tag/{tagName}
      */
 
-    function jumpNote(noteId: string, hash: string) {
-        return joplin.commands.execute('openNote', noteId, hash);
-    }
+    const path = removePathPrefix(url.pathname, 2);
 
-    const query = url.searchParams.get('query');
     let hash = url.hash;
     if (hash) {
         hash = hash.substr(1); // remove char `#`
     }
 
-    if (query) {
-        console.debug(`query: ${query}`);
-        const r = await joplin.data.get(['search'], {
-            fields: ['id'],
-            query
-        })
-        console.debug(`notes count: ${r.items.length}`);
-        if (r.items.length > 0) {
-            await jumpNote(r.items[0].id, hash);
-        }
+    function jumpNote(noteId: string) {
+        return joplin.commands.execute('openNote', noteId, hash);
     }
 
-    else if (hash) {
-        // do I need this? I already had outline.
-        // joplin.commands.execute('scrollToHash', hash);
+    function jumpNoteBook(noteBookId: string) {
+        return joplin.commands.execute('openFolder', noteBookId);
+    }
+
+    function jumpTag(tagId: string) {
+        return joplin.commands.execute('openTag', tagId);
+    }
+
+    let type: 'folder' | 'tag' | 'note';
+    let jumper: (id: string) => Promise<any>;
+    let objId: string = '';
+
+    const lowerPath = path.toLowerCase();
+    if (lowerPath === 'notebooks' || lowerPath.startsWith('notebooks/')) {
+        type = 'folder';
+        jumper = jumpNoteBook;
+        objId = removePathPrefix(path.substr(9), 1);
+    }
+    else if (lowerPath === 'tags' || lowerPath.startsWith('tags/')) {
+        type = 'tag';
+        jumper = jumpTag;
+        objId = removePathPrefix(path.substr(4), 1);
+    }
+    else if (lowerPath === 'notes' || lowerPath.startsWith('notes/') || !lowerPath) {
+        type = 'note';
+        jumper = jumpNote;
+        if (lowerPath) {
+            objId = removePathPrefix(path.substr(5), 1);
+        }
+    } else {
+        console.debug(`ignore unknown path: ${path}`);
+        return; // ignored
+    }
+    console.debug(`link type: ${type}`);
+
+    let r;
+    if (objId) {
+        console.debug(`find by id: ${objId}`);
+        try {
+            r = await joplin.data.get([type + 's', objId]);
+        } catch (error) {
+            // not found
+            return;
+        }
+    }
+    else {
+        const query = url.searchParams.get('query');
+        if (!query) {
+            return;
+        }
+        console.debug(`find by query: ${query}`);
+        r = await joplin.data.get(['search'], {
+            fields: ['id'],
+            query,
+            type
+        });
+    }
+
+    console.debug(`total count: ${r.items.length}`);
+
+    if (r.items.length > 0) {
+        await jumper(r.items[0].id);
     }
 }
 
@@ -54,7 +108,7 @@ async function exec(url: URL) {
      *   - exec://{command}?0=a&1=ds
      */
 
-    let command = removePathPrefix(url.pathname);
+    let command = removePathPrefix(url.pathname, 2);
 
     const args = [];
     for (let i = 0; i < 20; i++) {

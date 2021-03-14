@@ -9,8 +9,14 @@ A Joplin plugin for custom links.
 ### Jump via query
 
 ``` markdown
-[???](jump://?query=blabla)
-[???](jump://?query=title:blabla) # search by title
+[???](jump://notes/{noteId})            # jump to note by id
+[???](jump://notebooks/{notebookId})    # jump to notebook by id
+[???](jump://tags/{tagId})              # jump to tag by id
+
+[???](jump://?query=blabla)             # jump to note via search
+[???](jump://notes/?query=blabla)       # jump to note via search (also)
+[???](jump://notebooks/?query=blabla)   # jump to notebook via search
+[???](jump://tags/?query=blabla)        # jump to tag via search
 ```
 
 For more query syntax, see [here](https://joplinapp.org/#searching).
