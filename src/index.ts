@@ -116,16 +116,14 @@ async function exec(url: URL) {
     let command = removePathPrefix(url.pathname, 2);
 
     const args = [];
-    for (let i = 0; i < 20; i++) {
-        const is = i.toString();
-        if (url.searchParams.has(is)) {
-            let val = url.searchParams.get(is);
+    for (const [key, value] of url.searchParams.entries()) {
+        const index = Number.parseInt(key, 10);
+        if (index !== NaN && index >= 0) {
+            let val = value;
             try {
                 val = JSON.parse(val);
             } catch {}
-            args.push(val);
-        } else {
-            break;
+            args[index] = val;
         }
     }
 
